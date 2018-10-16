@@ -5,3 +5,4 @@ vendor.noindex/
 coverage/
 .DS_Store
 Gemfile.lock
+.rspec
