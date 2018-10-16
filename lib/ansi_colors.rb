@@ -1,5 +1,5 @@
 # Adds several useful methods to strings
-class String
+module AnsiColors
   # The color commands understood by the overridden method_missing method.
   ANSI_CMDS = {
     :bright               =>    [1, :normal],
@@ -38,7 +38,8 @@ class String
   def quote
     %Q{"#{self}"}
   end
-  
+
+
   # Unquote a quoted string (e.g. "'test'".quote => 'test'
   def unquote
     match = /"(.*)"/.match(self)
@@ -86,5 +87,4 @@ class String
   def blank?
     self.strip.size == 0
   end
-
 end
