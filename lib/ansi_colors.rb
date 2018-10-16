@@ -1,5 +1,10 @@
 # Adds several useful methods to strings
 module AnsiColors
+
+  # Show where errors originate.
+  class Error < StandardError; end
+
+
   # The color commands understood by the overridden method_missing method.
   ANSI_CMDS = {
     :bright               =>    [1, :normal],
@@ -69,19 +74,18 @@ module AnsiColors
       return super      
     end
 
-    color_code = ANSI_CMDS[meth.to_s[5..-1].to_sym]
-    end_code = :reset
-    if color_code.is_a?(Array)
-      color_code, end_code = color_code
-    end
-    if end_code.is_a?(meth)
-      end_code = ANSI_CMDS[end_code]
-    end
+    if color_code = ANSI_CMDS[meth.to_s[5..-1].to_sym]
+      end_code = :reset
 
-    if color_code
+      if color_code.responds_to? :each_index
+        color_code, end_code = color_code
+      end
+
+      if end_code.is_a? Symbol
+        end_code = ANSI_CMDS[end_code]
+      end
+
       colorize(color_code, end_code)
-    else
-      raise "Unknown ansi code"
     end
   end
 
