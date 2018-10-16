@@ -86,6 +86,12 @@ module AnsiColors
   end
 
 
+  def respond_to_missing?(method, *)
+    AnsiColors::ANSI_CMDS.keys.any?{|k| method.to_s == "ansi_#{k}" } or
+    super
+  end
+
+
   # returns true if the stripped version of the string has zero lenght (i.e., 
   # if the string is empty or contains only space characters)
   def blank?
