@@ -40,41 +40,18 @@ module AnsiColors
   }
 
 
-  # Returns a quoted version of the string)
-  def quote
-    %Q{"#{self}"}
-  end
+  class << self
 
-
-  # Unquote a quoted string (e.g. "'test'".quote => 'test'
-  def unquote
-    match = /"(.*)"/.match(self)
-    match ?  match[1] : self
-  end
-
-
-  # Adds escape chars to the string so that it appears coloured when printed on an
-  # ansi compliant terminal (non-ansi terminals will display the string surrounded
-  # by garbage-like stuff). col_code specifies the color to be used. 
-  def colorize(col_code, end_code)
-    "\033[#{col_code}m#{self}\033[#{end_code}m"
-  end
-
-
-  # Override method_missing in order to add methods to colorize the string. The
-  # supported methods starts with the string 'ansi_' followed by the color to be
-  # used. Some examples:
-  #   - str.ansi_blue will change the foreground color of string 'str' to blue
-  #   - str.ansi_bck_red will change the background color of string 'str' to red
-  # see ANSI_CMDS for a list of available commands. Combination are possible. Some
-  # examples:
-  #   - str.ansi_blue.ansi_bck_red.ansi_bold will change str so to appear as a bold blue text on a red background
-  def method_missing meth, *others
-    if meth.to_s !~ /\Aansi_.*\Z/
-      return super      
+    # Adds escape chars to the string so that it appears coloured when printed on an
+    # ansi compliant terminal (non-ansi terminals will display the string surrounded
+    # by garbage-like stuff). col_code specifies the color to be used. 
+    def colorize(str, col_code, end_code)
+      "\033[#{col_code}m#{str}\033[#{end_code}m"
     end
 
-    if color_code = ANSI_CMDS[meth.to_s[5..-1].to_sym]
+
+    def get_codes meth
+      color_code = ANSI_CMDS[meth.to_s[5..-1].to_sym]
       end_code = :reset
 
       if color_code.responds_to? :each_index
@@ -85,14 +62,34 @@ module AnsiColors
         end_code = ANSI_CMDS[end_code]
       end
 
-      colorize(color_code, end_code)
+      [color_code,end_code]
+    end
+  
+  end
+
+
+  def colorize col_code, end_code
+    self.class.colorize self, col_code, end_code
+  end
+
+
+  ANSI_CMDS.each do |k,v|
+    define_method "ansi_#{k}" do
+      colorize *get_codes(meth)
     end
   end
 
 
-  def respond_to_missing?(method, *)
-    AnsiColors::ANSI_CMDS.keys.any?{|k| method.to_s == "ansi_#{k}" } or
-    super
+  # Returns a quoted version of the string)
+  def quote
+    %Q{"#{self}"}
+  end
+
+
+  # Unquote a quoted string (e.g. "'test'".quote => 'test'
+  def unquote
+    match = /"(.*)"/.match(self)
+    match ?  match[1] : self
   end
 
 
