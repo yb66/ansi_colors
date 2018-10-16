@@ -33,7 +33,8 @@ module AnsiColors
     :default_color        =>    39,
     :default_background   =>    49		
   }
-  
+
+
   # Returns a quoted version of the string)
   def quote
     %Q{"#{self}"}
@@ -45,14 +46,16 @@ module AnsiColors
     match = /"(.*)"/.match(self)
     match ?  match[1] : self
   end
-  
+
+
   # Adds escape chars to the string so that it appears coloured when printed on an
   # ansi compliant terminal (non-ansi terminals will display the string surrounded
   # by garbage-like stuff). col_code specifies the color to be used. 
   def colorize(col_code, end_code)
     "\033[#{col_code}m#{self}\033[#{end_code}m"
   end
-  
+
+
   # Override method_missing in order to add methods to colorize the string. The
   # supported methods starts with the string 'ansi_' followed by the color to be
   # used. Some examples:
@@ -81,6 +84,7 @@ module AnsiColors
       raise "Unknown ansi code"
     end
   end
+
 
   # returns true if the stripped version of the string has zero lenght (i.e., 
   # if the string is empty or contains only space characters)
