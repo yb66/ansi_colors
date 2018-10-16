@@ -3,23 +3,21 @@ require_relative "../lib/ansi_colors.rb"
 
 context "Mixing" do
   Mixed = Class.new(String) do
-    include AnsiColors
+    include AnsiColors::ThreeFourBit
   end
 
   When(:mixed_instance) {
     Mixed.new "Hello"
   }
 
-  Then { mixed_instance.respond_to? :quote }
-  Then { mixed_instance.respond_to? :unquote }
   Then { mixed_instance.respond_to? :colorize }
-  AnsiColors::ANSI_CMDS.each do |k,v|
+  AnsiColors::ThreeFourBit::ANSI_CMDS.each do |k,v|
     And { mixed_instance.respond_to? "ansi_#{k}".to_sym }
   end
 
   context "The codes" do
     context "Valid codes" do
-      AnsiColors::ANSI_CMDS.each do |k,v|
+      AnsiColors::ThreeFourBit::ANSI_CMDS.each do |k,v|
         context k.to_s do
           When(:code) { mixed_instance.get_codes k }
           Then { code.first == v or code.first == v.first }
@@ -29,6 +27,14 @@ context "Mixing" do
       context "30, black" do
         When(:coloured) { mixed_instance.colorize 30 }
         Then { coloured == "\e[30mHello\e[39m" }
+      end
+
+
+      context "That is not specified by the library but is an ANSI code" do
+        context "30, black" do
+          When(:coloured) { mixed_instance.colorize 30 }
+          Then { coloured == "\e[30mHello\e[39m" }
+        end
       end
     end
 
