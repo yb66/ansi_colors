@@ -64,17 +64,17 @@ module AnsiColors
   # see ANSI_CMDS for a list of available commands. Combination are possible. Some
   # examples:
   #   - str.ansi_blue.ansi_bck_red.ansi_bold will change str so to appear as a bold blue text on a red background
-  def method_missing symbol, *others
-    if symbol.to_s !~ /\Aansi_.*\Z/
+  def method_missing meth, *others
+    if meth.to_s !~ /\Aansi_.*\Z/
       return super      
     end
 
-    color_code = ANSI_CMDS[symbol.to_s[5..-1].to_sym]
+    color_code = ANSI_CMDS[meth.to_s[5..-1].to_sym]
     end_code = :reset
     if color_code.is_a?(Array)
       color_code, end_code = color_code
     end
-    if end_code.is_a?(Symbol)
+    if end_code.is_a?(meth)
       end_code = ANSI_CMDS[end_code]
     end
 
